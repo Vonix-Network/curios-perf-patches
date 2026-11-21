@@ -3,7 +3,6 @@
   "minVersion": "0.8.5",
   "package": "network.vonix.curiosperf.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "curiosperf.refmap.json",
   "plugin": "network.vonix.curiosperf.internal.CuriosPerfMixinPlugin",
   "mixins": [
     "LivingEntityMixin",

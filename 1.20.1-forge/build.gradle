@@ -1,0 +1,132 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+version = "${minecraft_version}-${mod_version}"
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // Exact Curios pin. compileOnly so the released jar never bundles Curios.
+    compileOnly fg.deobf("maven.modrinth:curios:${curios_version}")
+    // Present at runtime in the dev server so the mixin has a real target.
+    runtimeOnly fg.deobf("maven.modrinth:curios:${curios_version}")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+// Fail the build loudly if the pinned Curios artifact cannot be resolved,
+// rather than producing a jar that cannot patch anything.
+tasks.register('verifyCuriosPin') {
+    doLast {
+        def cfg = configurations.getByName('compileClasspath')
+        def found = cfg.resolvedConfiguration.resolvedArtifacts.find {
+            it.moduleVersion.id.group == 'maven.modrinth' && it.moduleVersion.id.name == 'curios'
+        }
+        if (found == null) {
+            throw new GradleException("Pinned Curios ${curios_version} was not resolved; refusing to build.")
+        }
+        logger.lifecycle("Curios pin OK: ${found.moduleVersion.id} (${found.file.name})")
+    }
+}
+
+tasks.named('compileJava') { dependsOn 'verifyCuriosPin' }
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
+            loader_version_range   : loader_version_range,
+            curios_version         : curios_version,
+            curios_version_range   : curios_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'MixinConfigs'            : 'curiosperf.mixins.json',
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
+
+mixin {
+    add sourceSets.main, 'curiosperf.refmap.json'
+    config 'curiosperf.mixins.json'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven { url "file://${project.projectDir}/mcmodsrepo" }
+    }
+}

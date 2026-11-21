@@ -1,0 +1,47 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/Vonix-Network/curios-perf-patches/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''Behaviour-preserving performance patches for Curios API.
+
+Curios resolves an entity's accessory inventory by walking every capability provider
+attached to that entity. For entity types that no datapack gives curio slots to -
+animals, most monsters, most modded mobs - that walk always comes back empty, and it
+runs for every such entity on every tick.
+
+This mod remembers the empty answer per entity and reuses it while it stays true. It
+never changes how often an accessory ticks, so no item behaves differently. The flag is
+cleared whenever the entity's capabilities are rebuilt, so an inventory supplied by
+another mod is always seen.
+
+Built against and pinned to Curios ${curios_version}. On any other Curios build the
+patches refuse to apply and Curios is left exactly as it was, with one WARN line.
+
+Every patch is individually switchable in config/curiosperf-common.toml.'''
+
+[[dependencies.curiosperf]]
+modId="forge"
+mandatory=true
+versionRange="${forge_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.curiosperf]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.curiosperf]]
+modId="curios"
+mandatory=true
+versionRange="${curios_version_range}"
+ordering="AFTER"
+side="BOTH"

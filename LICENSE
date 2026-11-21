@@ -1,0 +1,19 @@
+GNU LESSER GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Curios Performance Patches
+Copyright (c) 2026 Vonix Network
+
+This program is free software: you can redistribute it and/or modify it under the terms of
+the GNU Lesser General Public License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Lesser General Public License for more details.
+
+The patches that mirror Curios API control flow are derived from Curios, which is
+Copyright (c) C4 and licensed LGPL-3.0-or-later.
+
+The full text of the GNU Lesser General Public License version 3 is available at
+<https://www.gnu.org/licenses/lgpl-3.0.txt>.

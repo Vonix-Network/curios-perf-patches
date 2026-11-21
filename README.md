@@ -56,13 +56,20 @@ breakdown.
 
 | Lane | Loader | Curios build pinned | Status |
 |---|---|---|---|
-| 1.20.1 | Forge 47.x | `5.14.1+1.20.1` | released |
+| 1.20.1 | Forge 47.x | `5.14.1+1.20.1` | **released** (`v1.20.1-1.0.0`) |
 | 1.20.4 | NeoForge | `7.4.3+1.20.4` | planned |
 | 1.20.6 | NeoForge | `8.1.0+1.20.6` | planned |
 | 1.21.1 | NeoForge | `9.6.0+1.21.1` | planned |
 
-Each lane is a separate Gradle build with its own pin, because Curios' handler signature
-and event type differ (`LivingTickEvent` on 1.20.1 vs `EntityTickEvent.Post` on 1.21.1).
+Each lane is a separate Gradle build with its own exact pin, because Curios' lookup
+signature and event type differ per line (`LivingTickEvent` and `LazyOptional` on 1.20.1 vs
+`EntityTickEvent.Post` and `Optional` on 1.21.1). [`docs/VERSIONS.md`](docs/VERSIONS.md) has
+the per-lane porting table and the gate list a lane must pass before release.
+
+### Download
+
+[`curiosperf-1.20.1-1.0.0.jar`](https://github.com/Vonix-Network/curios-perf-patches/releases/download/v1.20.1-1.0.0/curiosperf-1.20.1-1.0.0.jar)
+— sha256 `d994d7d1afa3b70d5f910135bfc81edee813dcc503dacc85e6ed35edfcaa0580`
 
 ## Building
 
